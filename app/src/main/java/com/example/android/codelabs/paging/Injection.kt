@@ -36,8 +36,10 @@ object Injection {
      * Creates an instance of [GithubLocalCache] based on the database DAO.
      */
     private fun provideCache(context: Context): GithubLocalCache {
-        val database = RepoDatabase.getInstance(context)
-        return GithubLocalCache(database.reposDao(), Executors.newSingleThreadExecutor())
+        val database = RepoDatabase.getInstance(context) // create Room db
+        return GithubLocalCache(database.reposDao(),// Dao implementation
+                Executors.newSingleThreadExecutor()// single thread sequential executor
+        )
     }
 
     /**
@@ -45,7 +47,9 @@ object Injection {
      * [GithubLocalCache]
      */
     private fun provideGithubRepository(context: Context): GithubRepository {
-        return GithubRepository(GithubService.create(), provideCache(context))
+        return GithubRepository(GithubService.create(),//create retrofit service call for github
+                provideCache(context)// set cache
+        )
     }
 
     /**

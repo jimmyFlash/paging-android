@@ -41,8 +41,9 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search_repositories)
 
         // get the view model
-        viewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this))
-                .get(SearchRepositoriesViewModel::class.java)
+        viewModel = ViewModelProviders.of(this,
+                Injection.provideViewModelFactory(this)) // use dependency injection to provide viewmwodel factory instance
+                .get(SearchRepositoriesViewModel::class.java)// create instance of the SearchRepositoriesViewModel from factory
 
         // add dividers between RecyclerView's row items
         val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
@@ -113,6 +114,9 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * helper method to listen to scroll on the rv
+     */
     private fun setupScrollListener() {
         val layoutManager = list.layoutManager as androidx.recyclerview.widget.LinearLayoutManager
         list.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
@@ -122,6 +126,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
                 val visibleItemCount = layoutManager.childCount
                 val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
 
+                // call viewmodel listScrolled
                 viewModel.listScrolled(visibleItemCount, lastVisibleItem, totalItemCount)
             }
         })

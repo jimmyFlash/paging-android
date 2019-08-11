@@ -32,7 +32,7 @@ import com.example.android.codelabs.paging.model.Repo
 )
 abstract class RepoDatabase : RoomDatabase() {
 
-    abstract fun reposDao(): RepoDao
+    abstract fun reposDao(): RepoDao // implements RepoDao interface for dara access object of db
 
     companion object {
 
@@ -41,10 +41,12 @@ abstract class RepoDatabase : RoomDatabase() {
 
         fun getInstance(context: Context): RepoDatabase =
                 INSTANCE ?: synchronized(this) {
-                    INSTANCE
-                            ?: buildDatabase(context).also { INSTANCE = it }
+                    INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
                 }
 
+        /**
+         * build our room DB
+         */
         private fun buildDatabase(context: Context) =
                 Room.databaseBuilder(context.applicationContext,
                         RepoDatabase::class.java, "Github.db")

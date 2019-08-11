@@ -51,11 +51,19 @@ class SearchRepositoriesViewModel(private val repository: GithubRepository) : Vi
         queryLiveData.postValue(queryString)
     }
 
+    /**
+     * when scrolling the rv if the visible items count + last vis. item pos + the threshold is
+     * larger than the total items count, get the last query string, if it's not null
+     * request more items form repository manager using the query string
+     * visibleItemCount : current visible items in rv
+     * lastVisibleItemPosition : position of last item in the retrieved list
+     * totalItemCount :  total count of items retrieved per page
+     */
     fun listScrolled(visibleItemCount: Int, lastVisibleItemPosition: Int, totalItemCount: Int) {
         if (visibleItemCount + lastVisibleItemPosition + VISIBLE_THRESHOLD >= totalItemCount) {
             val immutableQuery = lastQueryValue()
             if (immutableQuery != null) {
-                repository.requestMore(immutableQuery)
+                repository.requestMore(immutableQuery)// retrieve more results from network
             }
         }
     }

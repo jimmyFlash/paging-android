@@ -49,8 +49,8 @@ fun searchRepos(
     page: Int,
     itemsPerPage: Int,
     onSuccess: (repos: List<Repo>) -> Unit,
-    onError: (error: String) -> Unit
-) {
+    onError: (error: String) -> Unit) {
+
     Log.d(TAG, "query: $query, page: $page, itemsPerPage: $itemsPerPage")
 
     val apiQuery = query + IN_QUALIFIER
@@ -82,7 +82,7 @@ fun searchRepos(
  * Github API communication setup via Retrofit.
  */
 interface GithubService {
-    /**
+    /** retrofit
      * Get repos ordered by stars.
      */
     @GET("search/repositories?sort=stars")
@@ -90,7 +90,7 @@ interface GithubService {
         @Query("q") query: String,
         @Query("page") page: Int,
         @Query("per_page") itemsPerPage: Int
-    ): Call<RepoSearchResponse>
+    ): Call<RepoSearchResponse> // returns a RepoSearchResponse class
 
     companion object {
         private const val BASE_URL = "https://api.github.com/"

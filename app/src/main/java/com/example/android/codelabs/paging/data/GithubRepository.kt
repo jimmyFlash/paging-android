@@ -54,16 +54,30 @@ class GithubRepository(
         return RepoSearchResult(data, networkErrors)
     }
 
+    /**
+     *
+     */
     fun requestMore(query: String) {
         requestAndSaveData(query)
     }
 
+    /**
+     * request more items from network with query string
+     * cache results in db on success
+     * or post error message on fail
+     */
     private fun requestAndSaveData(query: String) {
         if (isRequestInProgress) return
 
         isRequestInProgress = true
+        /*
+        make a service call to github with specified query and request page counter
+        on success insert the list of repo objects into db table and increment last requested page counter
+        on fail/error post the error string to livedata
+         */
         searchRepos(service, query, lastRequestedPage, NETWORK_PAGE_SIZE, { repos ->
-            cache.insert(repos) {
+            cache.insert(repos
+            ) { // lambda that executes when insertion is done, moved outside parenthesis
                 lastRequestedPage++
                 isRequestInProgress = false
             }
@@ -74,6 +88,6 @@ class GithubRepository(
     }
 
     companion object {
-        private const val NETWORK_PAGE_SIZE = 50
+        private const val NETWORK_PAGE_SIZE = 50 // number of items per page
     }
 }
