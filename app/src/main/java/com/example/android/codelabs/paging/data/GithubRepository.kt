@@ -71,7 +71,7 @@ class GithubRepository(
 
         isRequestInProgress = true
         /*
-        make a service call to github with specified query and request page counter
+        make a service call to github with specified query and increment request page counter
         on success insert the list of repo objects into db table and increment last requested page counter
         on fail/error post the error string to livedata
          */

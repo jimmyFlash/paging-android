@@ -47,7 +47,7 @@ object Injection {
      * [GithubLocalCache]
      */
     private fun provideGithubRepository(context: Context): GithubRepository {
-        return GithubRepository(GithubService.create(),//create retrofit service call for github
+        return GithubRepository(GithubService.create(),//create retrofit service call for github with implementation of endpoints
                 provideCache(context)// set cache
         )
     }
@@ -55,6 +55,8 @@ object Injection {
     /**
      * Provides the [ViewModelProvider.Factory] that is then used to get a reference to
      * [ViewModel] objects.
+     *
+     * has instance of the GithubRepository in constructor and context
      */
     fun provideViewModelFactory(context: Context): ViewModelProvider.Factory {
         return ViewModelFactory(provideGithubRepository(context))

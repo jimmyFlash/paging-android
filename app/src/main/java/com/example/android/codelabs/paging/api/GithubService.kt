@@ -55,6 +55,7 @@ fun searchRepos(
 
     val apiQuery = query + IN_QUALIFIER
 
+    // make a service call
     service.searchRepos(apiQuery, page, itemsPerPage).enqueue(
             object : Callback<RepoSearchResponse> {
                 override fun onFailure(call: Call<RepoSearchResponse>?, t: Throwable) {
@@ -92,6 +93,9 @@ interface GithubService {
         @Query("per_page") itemsPerPage: Int
     ): Call<RepoSearchResponse> // returns a RepoSearchResponse class
 
+    /**
+     * create base url and build retrofit client call
+     */
     companion object {
         private const val BASE_URL = "https://api.github.com/"
 
@@ -107,7 +111,7 @@ interface GithubService {
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
-                    .create(GithubService::class.java)
+                    .create(GithubService::class.java) // Create an implementation of the API endpoints defined by the service interface (GithubService).
         }
     }
 }

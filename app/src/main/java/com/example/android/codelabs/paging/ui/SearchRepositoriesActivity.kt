@@ -42,37 +42,52 @@ class SearchRepositoriesActivity : AppCompatActivity() {
 
         // get the view model
         viewModel = ViewModelProviders.of(this,
-                Injection.provideViewModelFactory(this)) // use dependency injection to provide viewmwodel factory instance
-                .get(SearchRepositoriesViewModel::class.java)// create instance of the SearchRepositoriesViewModel from factory
+                Injection.provideViewModelFactory(this)) // use dependency injection to provide viewmwodel factory instance with context
+                .get(SearchRepositoriesViewModel::class.java)// create instance of the SearchRepositoriesViewModel from factory, with instance GithubRepository injected through constructor
 
         // add dividers between RecyclerView's row items
         val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
         list.addItemDecoration(decoration)
+        //listen to scroll event on rv to load more data from network
         setupScrollListener()
 
-        initAdapter()
+        initAdapter()// initiate adapter and load default repo list from network
+        // check if the search query string
         val query = savedInstanceState?.getString(LAST_SEARCH_QUERY) ?: DEFAULT_QUERY
+        // initiate / update search query string livedata in vm
         viewModel.searchRepo(query)
         initSearch(query)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        // keep track of last search query string
         outState.putString(LAST_SEARCH_QUERY, viewModel.lastQueryValue())
     }
 
+    /**
+     * initiate and set the rv adapter
+     * observe the vm repos live data for returned list of repo from network call
+     *
+     * observes network error messages
+     */
     private fun initAdapter() {
         list.adapter = adapter
+        // observer list of repo live data returned form network call
         viewModel.repos.observe(this, Observer<List<Repo>> {
             Log.d("Activity", "list: ${it?.size}")
-            showEmptyList(it?.size == 0)
-            adapter.submitList(it)
+            showEmptyList(it?.size == 0) // hide list if size is 0, show tv with msg
+            adapter.submitList(it) // Submits a new list to be diffed, and displayed.
         })
         viewModel.networkErrors.observe(this, Observer<String> {
             Toast.makeText(this, "\uD83D\uDE28 Wooops $it", Toast.LENGTH_LONG).show()
         })
     }
 
+    /**
+     * display query sting
+     * initiate search
+     */
     private fun initSearch(query: String) {
         search_repo.setText(query)
 
@@ -97,13 +112,18 @@ class SearchRepositoriesActivity : AppCompatActivity() {
     private fun updateRepoListFromInput() {
         search_repo.text.trim().let {
             if (it.isNotEmpty()) {
-                list.scrollToPosition(0)
-                viewModel.searchRepo(it.toString())
-                adapter.submitList(null)
+                list.scrollToPosition(0)// reset rv scroll
+                viewModel.searchRepo(it.toString()) // initiate a search for query
+                adapter.submitList(null) // empty/reset the adapter
             }
         }
     }
 
+    /**
+     * helper method to show or hide a textview relaying no data message
+     * or the list of repos
+     * @param show flag indicating ui state
+     */
     private fun showEmptyList(show: Boolean) {
         if (show) {
             emptyList.visibility = View.VISIBLE
@@ -133,7 +153,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val LAST_SEARCH_QUERY: String = "last_search_query"
-        private const val DEFAULT_QUERY = "Android"
+        private const val LAST_SEARCH_QUERY: String = "last_search_query" // last saved search string
+        private const val DEFAULT_QUERY = "Android" // default git repo search query string
     }
 }

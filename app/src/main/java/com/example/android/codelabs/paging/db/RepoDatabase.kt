@@ -32,7 +32,7 @@ import com.example.android.codelabs.paging.model.Repo
 )
 abstract class RepoDatabase : RoomDatabase() {
 
-    abstract fun reposDao(): RepoDao // implements RepoDao interface for dara access object of db
+    abstract fun reposDao(): RepoDao // implements RepoDao interface for data access object of db
 
     companion object {
 
