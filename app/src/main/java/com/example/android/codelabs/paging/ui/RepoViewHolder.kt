@@ -23,33 +23,43 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.databinding.DataBindingUtil
 import com.example.android.codelabs.paging.R
+import com.example.android.codelabs.paging.databinding.RepoViewItemBinding
 import com.example.android.codelabs.paging.model.Repo
 
 /**
  * View Holder for a [Repo] RecyclerView list item.
  */
-class RepoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    private val name: TextView = view.findViewById(R.id.repo_name)
-    private val description: TextView = view.findViewById(R.id.repo_description)
-    private val stars: TextView = view.findViewById(R.id.repo_stars)
-    private val language: TextView = view.findViewById(R.id.repo_language)
-    private val forks: TextView = view.findViewById(R.id.repo_forks)
+class RepoViewHolder(view: RepoViewItemBinding) : RecyclerView.ViewHolder(view.root) {
+
+    private val name: TextView = view.repoName
+    private val description: TextView = view.repoDescription
+    private val stars: TextView = view.repoStars
+    private val language: TextView = view.repoLanguage
+    private val forks: TextView = view.repoForks
 
     private var repo: Repo? = null
 
+
     init {
-        view.setOnClickListener {
+        // register click listener on the view and open the url link to view repo in browser
+        view.root.setOnClickListener {
             repo?.url?.let { url ->
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                view.context.startActivity(intent)
+                view.root.context.startActivity(intent)
             }
         }
     }
 
+    /**
+     * handles displaying the repo data per item, or dummy text until it's loaded
+     */
     fun bind(repo: Repo?) {
+        // when repo isn't loaded yet
         if (repo == null) {
-            val resources = itemView.resources
+            val resources = itemView.resources // Returns the resources associated with this view.
+
             name.text = resources.getString(R.string.loading)
             description.visibility = View.GONE
             language.visibility = View.GONE
@@ -60,6 +70,9 @@ class RepoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         }
     }
 
+    /**
+     * displays the full dat of the repo when loaded
+     */
     private fun showRepoData(repo: Repo) {
         this.repo = repo
         name.text = repo.fullName
@@ -86,10 +99,16 @@ class RepoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     }
 
     companion object {
+        /**
+         * inflates the view through databinding and instantiates the RepoViewHolder
+         */
         fun create(parent: ViewGroup): RepoViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.repo_view_item, parent, false)
-            return RepoViewHolder(view)
+            val inflator = LayoutInflater.from(parent.context)
+
+            val inflatedViewBinding = DataBindingUtil.inflate<RepoViewItemBinding>(inflator,
+                    R.layout.repo_view_item,
+                    parent, false)
+            return RepoViewHolder(inflatedViewBinding)
         }
     }
 }
