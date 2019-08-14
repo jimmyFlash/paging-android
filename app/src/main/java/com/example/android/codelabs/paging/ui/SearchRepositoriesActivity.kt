@@ -25,6 +25,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.android.codelabs.paging.Injection
 import com.example.android.codelabs.paging.R
@@ -48,8 +49,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         // add dividers between RecyclerView's row items
         val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
         list.addItemDecoration(decoration)
-        //listen to scroll event on rv to load more data from network
-        setupScrollListener()
+
 
         initAdapter()// initiate adapter and load default repo list from network
         // check if the search query string
@@ -74,7 +74,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
     private fun initAdapter() {
         list.adapter = adapter
         // observer list of repo live data returned form network call
-        viewModel.repos.observe(this, Observer<List<Repo>> {
+        viewModel.repos.observe(this, Observer<PagedList<Repo>> {
             Log.d("Activity", "list: ${it?.size}")
             showEmptyList(it?.size == 0) // hide list if size is 0, show tv with msg
             adapter.submitList(it) // Submits a new list to be diffed, and displayed.
@@ -134,23 +134,6 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * helper method to listen to scroll on the rv
-     */
-    private fun setupScrollListener() {
-        val layoutManager = list.layoutManager as androidx.recyclerview.widget.LinearLayoutManager
-        list.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val totalItemCount = layoutManager.itemCount
-                val visibleItemCount = layoutManager.childCount
-                val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
-
-                // call viewmodel listScrolled
-                viewModel.listScrolled(visibleItemCount, lastVisibleItem, totalItemCount)
-            }
-        })
-    }
 
     companion object {
         private const val LAST_SEARCH_QUERY: String = "last_search_query" // last saved search string

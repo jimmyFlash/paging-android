@@ -17,12 +17,28 @@
 package com.example.android.codelabs.paging.model
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagedList
 
 /**
  * RepoSearchResult from a search, which contains LiveData<List<Repo>> holding query data,
  * and a LiveData<String> of network error state.
  */
 data class RepoSearchResult(
-    val data: LiveData<List<Repo>>,
-    val networkErrors: LiveData<String>
+
+        /**
+         * The alternative to List<Repo> is a PagedList<Repo>. A PagedList is a version of a List
+         * that loads content in chunks. Similar to the List, the PagedList holds a snapshot of content,
+         * so updates occur when new instances of PagedList are delivered via LiveData.
+         * When a PagedList is created, it immediately loads the first chunk of data and expands
+         * over time as content is loaded in future passes. The size of PagedList is the number of
+         * items loaded during each pass. The class supports both infinite lists and very large
+         * lists with a fixed number of elements.
+         *
+         * The PagedList loads content dynamically from a source. In our case, because the database
+         * is the main source of truth for the UI, it also represents the source for the PagedList.
+         * If your app gets data directly from the network and displays it without caching,
+         * then the class that makes network requests would be your data source.
+         */
+        val data: LiveData<PagedList<Repo>>,
+        val networkErrors: LiveData<String>
 )

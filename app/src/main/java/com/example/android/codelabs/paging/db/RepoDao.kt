@@ -16,7 +16,7 @@
 
 package com.example.android.codelabs.paging.db
 
-import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -37,5 +37,15 @@ interface RepoDao {
     // and order those results descending, by the number of stars and then by name
     @Query("SELECT * FROM repos WHERE (name LIKE :queryString) OR (description LIKE " +
             ":queryString) ORDER BY stars DESC, name ASC")
-    fun reposByName(queryString: String): LiveData<List<Repo>>
+    fun reposByName(queryString: String): DataSource.Factory<Int, Repo>
+
+    /* DataSource.Factory
+    A source is defined by a DataSource class. To page in data from a source that can change—such
+    as a source that allows inserting, deleting or updating data—you will also need to implement
+    a DataSource.Factory that knows how to create the DataSource. Whenever the data is updated,
+    the DataSource is invalidated and re-created automatically through the DataSource.Factory.
+    The Room persistence library provides native support for data sources associated with the
+    Paging library. For a given query, Room allows you to return a DataSource.Factory
+    from the DAO and handles the implementation of the DataSource for you.
+     */
 }

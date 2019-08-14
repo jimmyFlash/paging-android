@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.paging.PagedList
 import com.example.android.codelabs.paging.data.GithubRepository
 import com.example.android.codelabs.paging.model.Repo
 import com.example.android.codelabs.paging.model.RepoSearchResult
@@ -30,9 +31,6 @@ import com.example.android.codelabs.paging.model.RepoSearchResult
  */
 class SearchRepositoriesViewModel(private val repository: GithubRepository) : ViewModel() {
 
-    companion object {
-        private const val VISIBLE_THRESHOLD = 5
-    }
 
     private val queryLiveData = MutableLiveData<String>()
 
@@ -55,7 +53,7 @@ class SearchRepositoriesViewModel(private val repository: GithubRepository) : Vi
     Transformation.switchMap : Returns a LiveData mapped from the input source LiveData by applying
         switchMapFunction to each value set on source.
      */
-    val repos: LiveData<List<Repo>> = Transformations.switchMap(repoResult) { it.data } // returns the list of repos live data from RepoSearchResult
+    val repos: LiveData<PagedList<Repo>> = Transformations.switchMap(repoResult) { it.data } // returns the list of repos live data from RepoSearchResult
     val networkErrors: LiveData<String> = Transformations.switchMap(repoResult) {
         it.networkErrors // // returns error string live data from RepoSearchResult
     }
@@ -69,22 +67,7 @@ class SearchRepositoriesViewModel(private val repository: GithubRepository) : Vi
         queryLiveData.postValue(queryString)
     }
 
-    /**
-     * when scrolling the rv if the visible items count + last vis. item pos + the threshold is
-     * larger than the total items per page count, get the last query string, if it's not null
-     * request more items from repository manager using the query string
-     * @param visibleItemCount : current visible items in rv
-     * @param lastVisibleItemPosition : position of last item in the retrieved list
-     * @param totalItemCount :  total count of items retrieved per page
-     */
-    fun listScrolled(visibleItemCount: Int, lastVisibleItemPosition: Int, totalItemCount: Int) {
-        if (visibleItemCount + lastVisibleItemPosition + VISIBLE_THRESHOLD >= totalItemCount) {
-            val immutableQuery = lastQueryValue() // last stored value of query string
-            if (immutableQuery != null) {
-                repository.requestMore(immutableQuery)// retrieve more results from network and store in db on success
-            }
-        }
-    }
+
 
     /**
      * Get the last query value.
