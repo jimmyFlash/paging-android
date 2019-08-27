@@ -9,3 +9,4 @@ using the paging  library of android jetback to search and load Github repos by 
 - DiffUtils
 - using PagedListAdapter
 - databinding
+- dependency injection without Dagger using ViewModelFactory
